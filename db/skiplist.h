@@ -175,15 +175,15 @@ struct SkipList<Key, Comparator>::Node {
 
  private:
   // Array of length equal to the node height.  next_[0] is lowest level link.
-  std::atomic<Node*> next_[1];
+  std::atomic<Node*> next_[1];  //这块其实特别少，它最后用了弹性指针的方式来对不同高度的Node进行不同内存的分配
 };
 
 template <typename Key, class Comparator>
 typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::NewNode(
     const Key& key, int height) {
   char* const node_memory = arena_->AllocateAligned(
-      sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1));
-  return new (node_memory) Node(key);
+      sizeof(Node) + sizeof(std::atomic<Node*>) * (height - 1));  //申请Node的空间 + (height-1)个std::atomic<Node*>的指针空间，
+  return new (node_memory) Node(key);                             //Node中本来有一个std::atomic<Node*>指针空间，加起来总共height个
 }
 
 template <typename Key, class Comparator>
@@ -209,6 +209,7 @@ inline void SkipList<Key, Comparator>::Iterator::Next() {
   node_ = node_->Next(0);
 }
 
+//从头结点开始找到小于当前节点的最近的节点，时间复杂度为O(n)，没有Next高效
 template <typename Key, class Comparator>
 inline void SkipList<Key, Comparator>::Iterator::Prev() {
   // Instead of using explicit "prev" links, we just search for the
@@ -238,6 +239,7 @@ inline void SkipList<Key, Comparator>::Iterator::SeekToLast() {
   }
 }
 
+//建立n级索引的概率是0.25 ^(n - 1) * 0.75，所以，建立1级索引的概率为75%，建立2级索引的概率为25%*75% = 18.75%，...
 template <typename Key, class Comparator>
 int SkipList<Key, Comparator>::RandomHeight() {
   // Increase height with probability 1 in kBranching
@@ -257,6 +259,7 @@ bool SkipList<Key, Comparator>::KeyIsAfterNode(const Key& key, Node* n) const {
   return (n != nullptr) && (compare_(n->key, key) < 0);
 }
 
+//读取大于等于key的第一个结点(并把所有层级上在key前面的结点记录到prev数组里),这是跳表最重要的实现
 template <typename Key, class Comparator>
 typename SkipList<Key, Comparator>::Node*
 SkipList<Key, Comparator>::FindGreaterOrEqual(const Key& key,
@@ -280,6 +283,7 @@ SkipList<Key, Comparator>::FindGreaterOrEqual(const Key& key,
   }
 }
 
+//如果key比链表的最小值还小，则返回head_
 template <typename Key, class Comparator>
 typename SkipList<Key, Comparator>::Node*
 SkipList<Key, Comparator>::FindLessThan(const Key& key) const {
@@ -355,7 +359,7 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
     // the loop below.  In the former case the reader will
     // immediately drop to the next level since nullptr sorts after all
     // keys.  In the latter case the reader will use the new node.
-    max_height_.store(height, std::memory_order_relaxed);
+    max_height_.store(height, std::memory_order_relaxed);  //将max_height_的值设置为height
   }
 
   x = NewNode(key, height);
