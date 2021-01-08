@@ -4,6 +4,8 @@
 #include "db/log_writer.h"
 #include "leveldb/env.h"
 
+// 这篇文章的剖析非常不错：http://mingxinglai.com/cn/2013/01/leveldb-log-and-env/
+
 namespace leveldb {
 
 class EvenStringDest : public WritableFile {
