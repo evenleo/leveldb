@@ -340,6 +340,9 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("db/version_edit_test.cc")
     leveldb_test("db/version_set_test.cc")
     leveldb_test("db/write_batch_test.cc")
+    leveldb_test("db/even_memtable_test.cc")
+    leveldb_test("db/even_db_test.cc")
+    leveldb_test("db/even_log_test.cc")
 
     leveldb_test("helpers/memenv/memenv_test.cc")
 
