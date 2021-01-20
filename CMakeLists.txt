@@ -356,6 +356,7 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("util/crc32c_test.cc")
     leveldb_test("util/hash_test.cc")
     leveldb_test("util/logging_test.cc")
+    leveldb_test("util/file_test.cc")
 
     # TODO(costan): This test also uses
     #               "util/env_{posix|windows}_test_helper.h"
