@@ -349,6 +349,7 @@ if(LEVELDB_BUILD_TESTS)
 
     leveldb_test("table/filter_block_test.cc")
     leveldb_test("table/table_test.cc")
+    leveldb_test("table/even_table_builder_test.cc")
 
     leveldb_test("util/arena_test.cc")
     leveldb_test("util/bloom_test.cc")
